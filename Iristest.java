@@ -119,6 +119,10 @@ public void trainable() throws Exception {
 double accuracy=0.0,temp=0.0;;
 
 AdaptiveLogisticRegression lr = new AdaptiveLogisticRegression(3, 3, new L1());
+for(Integer k:train)
+{
+	lr.train(target_train.get(k),data_train.get(k));
+}
 
  lr.close();
  ModelSerializer.writeBinary("/home/psuryawanshi/Downloads/alr2.model", lr.getBest().getPayload().getLearner());//.getModels().get(0));
