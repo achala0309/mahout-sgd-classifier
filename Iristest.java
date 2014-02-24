@@ -47,7 +47,7 @@ public class Iristest
 	List<Integer> train;
 	List<Integer> test;
 	ArrayList <Integer>target_train,target_test;
-	ArrayList<DenseVector> data_train,data_test;
+	List<Vector> data_train,data_test;
 	ArrayList<Integer> order_train,order_test;
 	List<String> raw_train,raw_test;
 	Random random;
