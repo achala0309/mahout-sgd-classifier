@@ -1,4 +1,4 @@
-package com.iris.data.mahout;
+package com.example.iris.data;
 
 
 import java.io.FileInputStream;
@@ -42,40 +42,41 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 //import javax.annotation.Resources;
 
-public class Iristest
+public class iris
 {
 	List<Integer> train;
 	List<Integer> test;
-	ArrayList <Integer>target_train,target_test;
-	List<Vector> data_train,data_test;
-	ArrayList<Integer> order_train,order_test;
-	List<String> raw_train,raw_test;
+	ArrayList <Integer>target;
+	List<Vector> data;
+	ArrayList<Integer> order;
+	List<String> raw;
 	Random random;
 	
 
     public  void buildTrainData() throws IOException {
 	 
 	  // Snip ...
+      RandomUtils.useTestSeed();
 	  Splitter onComma = Splitter.on(",");
 	 
 	  // read the data
-	  raw_train = Resources.readLines(Resources.getResource("iris-2D-mod.csv"), Charsets.UTF_8);
+	  raw = Resources.readLines(Resources.getResource("iris-2D-mod.csv"), Charsets.UTF_8);
 	  
 	   //System.out.println(raw_train);
 	  // holds features
-	  data_train = Lists.newArrayList();
+	  data= Lists.newArrayList();
 	 
 	  // holds target variable
-	  target_train = Lists.newArrayList();
+	  target= Lists.newArrayList();
 	 
 	  // for decoding target values
 	  Dictionary dict = new Dictionary();
 	 
 	  // for permuting data later
-	  order_train = Lists.newArrayList();
-	  for (String line : raw_train.subList(1, raw_train.size())) {
+	  order= Lists.newArrayList();
+	  for (String line : raw.subList(1, raw.size())) {
 	    // ; gets a list of indexes
-	    order_train.add(order_train.size());
+	    order.add(order.size());
 	 
 	    // parse the predictor variables
 	    DenseVector v = new DenseVector(3);
@@ -91,17 +92,17 @@ public class Iristest
 	    }
 	    v_withOriginalIntercept=(DenseVector) v.normalize();
 	    v_withOriginalIntercept.set(0, 1);
-	    data_train.add(v);
+	    data.add(v);
 	 
 	    // and the target
-	    target_train.add(dict.intern(Iterables.get(values, 2)));
+	    target.add(dict.intern(Iterables.get(values, 2)));
 	  }
 	  
 }
 
 public static void main(String[] args) throws Exception {
 	
-	Iristest t1=new Iristest();
+	iris t1=new iris();
 	t1.buildTrainData();
 	t1.trainable();
 
@@ -110,20 +111,18 @@ public void trainable() throws Exception {
 	
 	
 	double heldOutPercentage = 0.10;
-	int cutoff=(int)(heldOutPercentage*order_train.size());
-    Collections.shuffle(order_train);
-    List<Integer> test =  order_train.subList(0, cutoff);
-    List<Integer> train  =  order_train.subList(cutoff, order_train.size());
+	int cutoff=(int)(heldOutPercentage*order.size());
+    Collections.shuffle(order);
+    List<Integer> test =  order.subList(0, cutoff);
+    List<Integer> train  =  order.subList(cutoff, order.size());
     
 
 double accuracy=0.0,temp=0.0;;
 
 AdaptiveLogisticRegression lr = new AdaptiveLogisticRegression(3, 3, new L1());
-for(Integer k:train)
-{
-	lr.train(target_train.get(k),data_train.get(k));
+for(Integer k:train){
+lr.train(target.get(k),data.get(k));
 }
-
  lr.close();
  ModelSerializer.writeBinary("/home/psuryawanshi/Downloads/alr2.model", lr.getBest().getPayload().getLearner());//.getModels().get(0));
  InputStream in=new FileInputStream("/home/psuryawanshi/Downloads/alr2.model");
@@ -136,12 +135,13 @@ for(Integer k:train)
  	 for (Integer k : test) {
 	//Test testProfile;
 		  
-		  r=best.classifyFull(data_train.get(k)).maxValueIndex();
+		  r=best.classifyFull(data.get(k)).maxValueIndex();
 		  //System.out.println("r="+r+" "+"target_train.get(k)="+target_train.get(k));
-		  x += r == target_train.get(k) ? 1 : 0;
+		  x += r == target.get(k) ? 1 : 0;
 	  }
     
  	accuracy=(double)(x)/(double)(test.size());
+ 	accuracy*=100.0;
   
 System.out.printf("accuracy is %f\n", accuracy);
 }
